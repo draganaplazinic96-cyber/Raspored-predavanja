@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="sr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Распоред наставе</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0f1117;
+    --surface: #1a1d27;
+    --border: #2a2d3a;
+    --accent1: #c8a96e;
+    --accent2: #6e9fc8;
+    --text: #e8e6e0;
+    --muted: #7a7a8c;
+    --pred-bg: rgba(110,159,200,0.12);
+    --pred-col: #8bb8d9;
+    --vez-bg: rgba(120,200,140,0.12);
+    --vez-col: #82c89a;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    padding: 40px 20px 60px;
+  }
+
+  header { text-align: center; margin-bottom: 48px; }
+
+  header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.2rem;
+    color: var(--accent1);
+    letter-spacing: 0.5px;
+  }
+
+  .week {
+    max-width: 680px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+  }
+
+  .day-label {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem;
+    color: var(--accent1);
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 10px;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .day-label::before {
+    content: '';
+    display: inline-block;
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--accent1);
+    flex-shrink: 0;
+  }
+
+  .entries { display: flex; flex-direction: column; gap: 10px; }
+
+  .entry {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 20px;
+    display: grid;
+    grid-template-columns: 56px 1fr auto;
+    align-items: center;
+    gap: 16px;
+    transition: border-color 0.2s;
+  }
+  .entry:hover { border-color: var(--accent1); }
+
+  .time-col { text-align: center; }
+  .time { font-size: 1.15rem; font-weight: 700; color: var(--text); line-height: 1.1; letter-spacing: -0.3px; }
+
+  .info { flex: 1; min-width: 0; }
+  .predmet-name { font-size: 0.97rem; font-weight: 600; color: var(--text); line-height: 1.3; margin-bottom: 4px; }
+  .sala { font-size: 0.78rem; color: var(--muted); }
+
+  .badge {
+    font-size: 0.7rem; font-weight: 600; letter-spacing: 0.5px;
+    padding: 4px 10px; border-radius: 99px; white-space: nowrap; flex-shrink: 0;
+  }
+  .badge.predavanje { background: var(--pred-bg); color: var(--pred-col); border: 1px solid rgba(110,159,200,0.25); }
+  .badge.vezbe      { background: var(--vez-bg);  color: var(--vez-col);  border: 1px solid rgba(120,200,140,0.25); }
+  .badge.kol        { background: rgba(200,169,110,0.12); color: var(--accent1); border: 1px solid rgba(200,169,110,0.25); }
+
+  /* Колоквијуми */
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.2rem;
+    color: var(--accent1);
+    text-align: center;
+    margin: 60px 0 28px;
+  }
+
+  .kol-add-btn {
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    width: 100%; padding: 14px;
+    background: transparent; border: 1px dashed var(--border); border-radius: 12px;
+    color: var(--muted); font-family: 'DM Sans', sans-serif; font-size: 0.88rem;
+    cursor: pointer; transition: all 0.2s; margin-bottom: 10px;
+  }
+  .kol-add-btn:hover { border-color: var(--accent1); color: var(--accent1); }
+  .kol-add-btn .plus { font-size: 1.2rem; font-weight: 300; line-height: 1; }
+
+  .kol-form {
+    background: var(--surface); border: 1px solid var(--accent1); border-radius: 14px;
+    padding: 20px; margin-bottom: 16px; display: none; flex-direction: column; gap: 12px;
+  }
+  .kol-form.open { display: flex; }
+
+  .kol-form label { font-size: 0.75rem; color: var(--muted); letter-spacing: 0.8px; text-transform: uppercase; margin-bottom: 4px; display: block; }
+
+  .kol-form select,
+  .kol-form input[type="date"],
+  .kol-form input[type="text"] {
+    width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 8px;
+    padding: 10px 12px; color: var(--text); font-family: 'DM Sans', sans-serif;
+    font-size: 0.88rem; outline: none; transition: border-color 0.2s; appearance: none;
+  }
+  .kol-form select:focus, .kol-form input:focus { border-color: var(--accent1); }
+
+  .kol-form-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 4px; }
+
+  .btn-save {
+    background: var(--accent1); color: #0f1117; border: none; border-radius: 8px;
+    padding: 9px 20px; font-family: 'DM Sans', sans-serif; font-size: 0.85rem;
+    font-weight: 700; cursor: pointer; transition: opacity 0.2s;
+  }
+  .btn-save:hover { opacity: 0.85; }
+
+  .btn-cancel {
+    background: transparent; color: var(--muted); border: 1px solid var(--border);
+    border-radius: 8px; padding: 9px 16px; font-family: 'DM Sans', sans-serif;
+    font-size: 0.85rem; cursor: pointer; transition: border-color 0.2s;
+  }
+  .btn-cancel:hover { border-color: var(--muted); }
+
+  .kol-list { display: flex; flex-direction: column; gap: 10px; }
+
+  .kol-entry {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+    padding: 16px 20px; display: grid; grid-template-columns: 56px 1fr auto;
+    align-items: center; gap: 16px; transition: border-color 0.2s;
+    animation: fadeIn 0.25s ease;
+  }
+  .kol-entry:hover { border-color: var(--accent1); }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .kol-date-col { text-align: center; }
+  .kol-day { font-size: 0.7rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.6px; }
+  .kol-dm  { font-size: 1.05rem; font-weight: 700; color: var(--text); line-height: 1.1; }
+  .kol-predmet { font-size: 0.97rem; font-weight: 600; color: var(--text); }
+  .kol-napomena { font-size: 0.78rem; color: var(--muted); margin-top: 3px; }
+
+  .kol-delete {
+    background: none; border: none; color: var(--muted); cursor: pointer;
+    font-size: 1rem; padding: 4px; border-radius: 6px; transition: color 0.2s; line-height: 1;
+  }
+  .kol-delete:hover { color: #e07070; }
+
+  .kol-empty { text-align: center; color: var(--muted); font-size: 0.85rem; padding: 20px 0; }
+
+  @media (max-width: 480px) {
+    .entry { grid-template-columns: 48px 1fr; grid-template-rows: auto auto; }
+    .badge { grid-column: 2; justify-self: start; margin-top: 4px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Распоред предавања и вежби</h1>
+</header>
+
+<div class="week">
+
+  <div class="day-block">
+    <div class="day-label">Понедељак</div>
+    <div class="entries">
+      <div class="entry">
+        <div class="time-col"><div class="time">10:30</div></div>
+        <div class="info"><div class="predmet-name">Локална самоуправа</div><div class="sala">📍 Слушаоница 9</div></div>
+        <span class="badge vezbe">Вежбе</span>
+      </div>
+      <div class="entry">
+        <div class="time-col"><div class="time">12:00</div></div>
+        <div class="info"><div class="predmet-name">Локална самоуправа</div><div class="sala">📍 Слушаоница 3</div></div>
+        <span class="badge predavanje">Предавање</span>
+      </div>
+      <div class="entry">
+        <div class="time-col"><div class="time">16:30</div></div>
+        <div class="info"><div class="predmet-name">Јавна управа</div><div class="sala">📍 Амфитеатар</div></div>
+        <span class="badge vezbe">Вежбе</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="day-block">
+    <div class="day-label">Уторак</div>
+    <div class="entries">
+      <div class="entry">
+        <div class="time-col"><div class="time">12:00</div></div>
+        <div class="info"><div class="predmet-name">Ауторитарни режими</div><div class="sala">📍 Слушаоница 15</div></div>
+        <span class="badge predavanje">Предавање</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="day-block">
+    <div class="day-label">Среда</div>
+    <div class="entries">
+      <div class="entry">
+        <div class="time-col"><div class="time">11:30</div></div>
+        <div class="info"><div class="predmet-name">Политикологија религије</div><div class="sala">📍 Амфитеатар</div></div>
+        <span class="badge predavanje">Предавање</span>
+      </div>
+      <div class="entry">
+        <div class="time-col"><div class="time">13:30</div></div>
+        <div class="info"><div class="predmet-name">Јавна управа</div><div class="sala">📍 Амфитеатар</div></div>
+        <span class="badge predavanje">Предавање</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="day-block">
+    <div class="day-label">Петак</div>
+    <div class="entries">
+      <div class="entry">
+        <div class="time-col"><div class="time">10:00</div></div>
+        <div class="info"><div class="predmet-name">Политикологија религије</div><div class="sala">📍 Слушаоница 6</div></div>
+        <span class="badge vezbe">Вежбе</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- КОЛОКВИЈУМИ -->
+<div class="week" style="margin-top:0">
+  <h2 class="section-title">Распоред колоквијума</h2>
+
+  <div id="kol-form" class="kol-form">
+    <div>
+      <label>Предмет</label>
+      <select id="kol-predmet">
+        <option value="">— Изабери предмет —</option>
+        <option>Локална самоуправа</option>
+        <option>Јавна управа</option>
+        <option>Ауторитарни режими</option>
+        <option>Политикологија религије</option>
+      </select>
+    </div>
+    <div>
+      <label>Датум</label>
+      <input type="date" id="kol-datum">
+    </div>
+    <div>
+      <label>Напомена (необавезно)</label>
+      <input type="text" id="kol-napomena" placeholder="нпр. градиво до 3. поглавља">
+    </div>
+    <div class="kol-form-actions">
+      <button class="btn-cancel" onclick="closeForm()">Одустани</button>
+      <button class="btn-save" onclick="saveKol()">Сачувај</button>
+    </div>
+  </div>
+
+  <button class="kol-add-btn" id="kol-add-btn" onclick="openForm()">
+    <span class="plus">＋</span> Додај колоквијум
+  </button>
+
+  <div class="kol-list" id="kol-list">
+    <div class="kol-empty" id="kol-empty">Нема унетих колоквијума.</div>
+  </div>
+</div>
+
+<script>
+  const DANI = ['Недеља','Понедељак','Уторак','Среда','Четвртак','Петак','Субота'];
+  const MESECI = ['јануар','фебруар','март','април','мај','јун','јул','август','септембар','октобар','новембар','децембар'];
+  let kolItems = [];
+
+  function openForm() {
+    document.getElementById('kol-form').classList.add('open');
+    document.getElementById('kol-add-btn').style.display = 'none';
+  }
+
+  function closeForm() {
+    document.getElementById('kol-form').classList.remove('open');
+    document.getElementById('kol-add-btn').style.display = 'flex';
+    document.getElementById('kol-predmet').value = '';
+    document.getElementById('kol-datum').value = '';
+    document.getElementById('kol-napomena').value = '';
+  }
+
+  function saveKol() {
+    const predmet = document.getElementById('kol-predmet').value;
+    const datum = document.getElementById('kol-datum').value;
+    const napomena = document.getElementById('kol-napomena').value.trim();
+    if (!predmet) { alert('Изабери предмет.'); return; }
+    if (!datum)   { alert('Унеси датум.'); return; }
+    kolItems.push({ predmet, datum, napomena });
+    kolItems.sort((a,b) => a.datum.localeCompare(b.datum));
+    renderKol();
+    closeForm();
+  }
+
+  function deleteKol(idx) {
+    kolItems.splice(idx, 1);
+    renderKol();
+  }
+
+  function renderKol() {
+    const list = document.getElementById('kol-list');
+    const empty = document.getElementById('kol-empty');
+    list.querySelectorAll('.kol-entry').forEach(e => e.remove());
+    if (kolItems.length === 0) { empty.style.display = 'block'; return; }
+    empty.style.display = 'none';
+    kolItems.forEach((item, i) => {
+      const d = new Date(item.datum + 'T12:00:00');
+      const dan = DANI[d.getDay()];
+      const dm = d.getDate() + '. ' + MESECI[d.getMonth()];
+      const el = document.createElement('div');
+      el.className = 'kol-entry';
+      el.innerHTML = `
+        <div class="kol-date-col">
+          <div class="kol-day">${dan.slice(0,3)}</div>
+          <div class="kol-dm">${dm}</div>
+        </div>
+        <div class="info">
+          <div class="kol-predmet">${item.predmet}</div>
+          ${item.napomena ? `<div class="kol-napomena">📝 ${item.napomena}</div>` : ''}
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span class="badge kol">Колоквијум</span>
+          <button class="kol-delete" onclick="deleteKol(${i})" title="Обриши">✕</button>
+        </div>
+      `;
+      list.appendChild(el);
+    });
+  }
+</script>
+
+</body>
+</html>
