@@ -126,7 +126,6 @@
     }
     .card.has-detail:hover .detail-arrow { color: #a0b4ff; }
 
-    /* ══ DRAWER ══ */
     .overlay {
       position: fixed;
       inset: 0;
@@ -228,7 +227,6 @@
     .lit-item:first-of-type { border-top: none; }
     .lit-item em { color: #b0b8d0; font-style: italic; }
 
-    /* ══ КОЛОКВИЈУМИ ══ */
     .section-divider {
       border: none;
       border-top: 1px solid #2a2d3e;
@@ -440,7 +438,7 @@
     <div class="day-title">Петак</div>
     <div class="entries">
       <div class="card">
-        <div class="c-time">09:00</div><div class="c-bar bar-p"></div>
+        <div class="c-time">09:30</div><div class="c-bar bar-p"></div>
         <div class="c-info"><div class="c-subject">Политичко понашање</div><div class="c-loc">Слушаоница 1</div></div>
         <div class="c-right"><div class="c-type type-p">Предавање</div></div>
       </div>
@@ -587,7 +585,6 @@ drawer.addEventListener('touchend', e => {
   if (e.changedTouches[0].clientY - startY > 60) closeDrawer();
 });
 
-// ══ КОЛОКВИЈУМИ ══
 const items = [];
 const MONTHS = ['јануара','фебруара','марта','априла','маја','јуна',
                 'јула','августа','септембра','октобра','новембра','децембра'];
