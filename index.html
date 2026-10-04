@@ -11,7 +11,7 @@
     body {
       background: #111318;
       color: #e4e6f0;
-      font-family: 'Sora', sans-serif;
+      font-family: 'Sora', system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
       padding: 2.4rem 1.1rem 4rem;
       min-height: 100vh;
     }
@@ -47,10 +47,11 @@
       transform: translateY(12px);
       animation: fadeUp 0.4s ease forwards;
     }
-    .day:nth-child(1){ animation-delay:.04s }
-    .day:nth-child(2){ animation-delay:.10s }
-    .day:nth-child(3){ animation-delay:.16s }
-    .day:nth-child(4){ animation-delay:.22s }
+    .day:nth-of-type(1){ animation-delay:.04s }
+    .day:nth-of-type(2){ animation-delay:.10s }
+    .day:nth-of-type(3){ animation-delay:.16s }
+    .day:nth-of-type(4){ animation-delay:.22s }
+    .day:nth-of-type(5){ animation-delay:.28s }
 
     @keyframes fadeUp { to { opacity:1; transform:translateY(0); } }
 
@@ -272,7 +273,7 @@
       border: 1px solid #2e3248;
       border-radius: 8px;
       color: #e4e6f0;
-      font-family: 'Sora', sans-serif;
+      font-family: inherit;
       font-size: 0.88rem;
       padding: 0.58rem 0.75rem;
       outline: none;
@@ -292,7 +293,7 @@
       color: #fff;
       border: none;
       border-radius: 8px;
-      font-family: 'Sora', sans-serif;
+      font-family: inherit;
       font-size: 0.85rem;
       font-weight: 700;
       padding: 0.65rem 1rem;
@@ -350,6 +351,11 @@
       font-size: 0.82rem;
       padding: 1.5rem 0;
     }
+    .day .empty-state {
+      background: #171a24;
+      border-radius: 12px;
+      padding: 0.9rem 0;
+    }
 
     footer {
       text-align: center;
@@ -379,28 +385,13 @@
   <div class="legend">
     <div class="legend-item"><div class="legend-dot" style="background:#4a8ef5"></div> Предавање</div>
     <div class="legend-item"><div class="legend-dot" style="background:#3ecf8e"></div> Вежбе</div>
-    <div class="legend-item" style="color:#5a6080; font-size:0.68rem;">↗ клик = детаљи</div>
   </div>
 
   <!-- ПОНЕДЕЉАК -->
   <div class="day">
     <div class="day-title">Понедељак</div>
     <div class="entries">
-      <div class="card">
-        <div class="c-time">10:30</div><div class="c-bar bar-v"></div>
-        <div class="c-info"><div class="c-subject">Локална самоуправа</div><div class="c-loc">Слушаоница 9</div></div>
-        <div class="c-right"><div class="c-type type-v">Вежбе</div></div>
-      </div>
-      <div class="card">
-        <div class="c-time">12:00</div><div class="c-bar bar-p"></div>
-        <div class="c-info"><div class="c-subject">Локална самоуправа</div><div class="c-loc">Слушаоница 3</div></div>
-        <div class="c-right"><div class="c-type type-p">Предавање</div></div>
-      </div>
-      <div class="card">
-        <div class="c-time">16:30</div><div class="c-bar bar-v"></div>
-        <div class="c-info"><div class="c-subject">Јавна управа</div><div class="c-loc">Амфитеатар</div></div>
-        <div class="c-right"><div class="c-type type-v">Вежбе</div></div>
-      </div>
+      <div class="empty-state">Нема наставе</div>
     </div>
   </div>
 
@@ -409,8 +400,13 @@
     <div class="day-title">Уторак</div>
     <div class="entries">
       <div class="card">
-        <div class="c-time">12:00</div><div class="c-bar bar-p"></div>
-        <div class="c-info"><div class="c-subject">Ауторитарни режими</div><div class="c-loc">Слушаоница 15</div></div>
+        <div class="c-time">09:30</div><div class="c-bar bar-p"></div>
+        <div class="c-info"><div class="c-subject">Политичко понашање</div><div class="c-loc">09:30–12:00 · Слушаоница 2</div></div>
+        <div class="c-right"><div class="c-type type-p">Предавање</div></div>
+      </div>
+      <div class="card">
+        <div class="c-time">10:00</div><div class="c-bar bar-p"></div>
+        <div class="c-info"><div class="c-subject">Партије и партијски системи</div><div class="c-loc">10:00–11:30 · Слушаоница 9</div></div>
         <div class="c-right"><div class="c-type type-p">Предавање</div></div>
       </div>
     </div>
@@ -421,15 +417,23 @@
     <div class="day-title">Среда</div>
     <div class="entries">
       <div class="card">
-        <div class="c-time">11:30</div><div class="c-bar bar-p"></div>
-        <div class="c-info"><div class="c-subject">Политикологија религије</div><div class="c-loc">Амфитеатар</div></div>
+        <div class="c-time">09:30</div><div class="c-bar bar-p"></div>
+        <div class="c-info"><div class="c-subject">Политичка култура и политички поредак</div><div class="c-loc">09:30–12:30 · Слушаоница 1</div></div>
         <div class="c-right"><div class="c-type type-p">Предавање</div></div>
       </div>
       <div class="card">
-        <div class="c-time">13:30</div><div class="c-bar bar-p"></div>
-        <div class="c-info"><div class="c-subject">Јавна управа</div><div class="c-loc">Амфитеатар</div></div>
+        <div class="c-time">14:00</div><div class="c-bar bar-p"></div>
+        <div class="c-info"><div class="c-subject">Политичко комуницирање</div><div class="c-loc">14:00–16:30 · Слушаоница 5</div></div>
         <div class="c-right"><div class="c-type type-p">Предавање</div></div>
       </div>
+    </div>
+  </div>
+
+  <!-- ЧЕТВРТАК -->
+  <div class="day">
+    <div class="day-title">Четвртак</div>
+    <div class="entries">
+      <div class="empty-state">Нема наставе</div>
     </div>
   </div>
 
@@ -438,14 +442,9 @@
     <div class="day-title">Петак</div>
     <div class="entries">
       <div class="card">
-        <div class="c-time">09:30</div><div class="c-bar bar-p"></div>
-        <div class="c-info"><div class="c-subject">Политичко понашање</div><div class="c-loc">Слушаоница 1</div></div>
+        <div class="c-time">09:00</div><div class="c-bar bar-p"></div>
+        <div class="c-info"><div class="c-subject">Економски систем Србије</div><div class="c-loc">09:00–10:30 · Слушаоница 2</div></div>
         <div class="c-right"><div class="c-type type-p">Предавање</div></div>
-      </div>
-      <div class="card has-detail" onclick="openDrawer('polrel')">
-        <div class="c-time">12:30</div><div class="c-bar bar-v"></div>
-        <div class="c-info"><div class="c-subject">Политикологија религије</div><div class="c-loc">Слушаоница 6</div></div>
-        <div class="c-right"><div class="c-type type-v">Вежбе</div><span class="detail-arrow">↗</span></div>
       </div>
     </div>
   </div>
@@ -458,7 +457,7 @@
     <div class="form-row">
       <div class="field" style="grid-column: 1 / -1;">
         <label>Предмет</label>
-        <input type="text" id="inp-subject" placeholder="нпр. Јавна управа">
+        <input type="text" id="inp-subject" placeholder="нпр. Партије и партијски системи">
       </div>
     </div>
     <div class="form-row">
@@ -482,71 +481,16 @@
     <div class="empty-state" id="empty-msg">Нема уписаних колоквијума</div>
   </div>
 
-  <footer>Летњи семестар 2025/2026.</footer>
+  <footer>Зимски семестар 2026/2027.</footer>
 </div>
 
 <script>
-const DETAILS = {
-  polrel: {
-    title: 'Политикологија религије',
-    subtitle: 'Вежбе · летњи семестар 2025/2026.',
-    sessions: [
-      {
-        date: '3. април',
-        topic: 'Увод у политикологију религије',
-        lit: [
-          'Мирољуб Јевтић, <em>Политикологија религије</em>, Центар за проучавање религије и верску толеранцију... стр. 1–29.',
-          'Питер Бергер, „Десекуларизација света", у: <em>Ридер из политикологије религије</em>.',
-          'Хозе Казанова, „Секуларизам и секуларизми", у: <em>Ридер из политикологије религије</em>.',
-        ]
-      },
-      {
-        date: '24. април',
-        topic: 'Јеврејство и политика',
-        lit: [
-          'Марко Вековић, <em>Религија за политикологе...</em> — поглавље „Јеврејство".',
-          'Мирољуб Јевтић, „Хришћански ционизам као чинилац политике САД", <em>Међународни проблеми</em>, год. 65, бр. 4, 2013, у: <em>Ридер из политикологије религије</em>.',
-        ]
-      },
-      {
-        date: '8. мај',
-        topic: 'Хришћанство и политика',
-        lit: [
-          'Марко Вековић, <em>Религија за политикологе...</em> — поглавље „Хришћанство".',
-          'Peter L. Berger, „The Global Picture", <em>Journal of Democracy</em>, Vol. 15, No. 2, 2004, у: <em>Ридер из политикологије религије</em>.',
-          'Семјуел Хантингтон, <em>Трећи талас демократизације на крају двадесетог века</em>, Стубови културе, Београд, 2004 — увод + поглавље „Религијске промене", у: <em>Ридер из политикологије религије</em>.',
-        ]
-      },
-      {
-        date: '15. мај',
-        topic: 'Ислам и политика',
-        lit: [
-          'Марко Вековић, <em>Религија за политикологе...</em> — поглавље „Ислам".',
-          'Samuel P. Huntington, „The Clash of Civilizations?", <em>Foreign Affairs</em>, Vol. 72, No. 3, 1993, у: <em>Ридер из политикологије религије</em>.',
-          'Steven M. Fish, „Islam and Authoritarianism", <em>World Politics</em>, Vol. 55, No. 1, 2002, у: <em>Ридер из политикологије религије</em>.',
-          'Alfred Stepan and Juan J. Linz, „Democratization Theory and the \'Arab Spring\'", <em>Journal of Democracy</em>, Vol. 24, No. 2, 2013, у: <em>Ридер из политикологије религије</em>.',
-        ]
-      },
-      {
-        date: '22. мај',
-        topic: 'Хиндуизам & будизам',
-        lit: [
-          'Марко Вековић, <em>Религија за политикологе...</em> — поглавља „Хиндуизам" и „Будизам".',
-          'Alfred Stepan, „Religion, Democracy, and the \'Twin Toleration\'", <em>Journal of Democracy</em>, Vol. 11, No. 4, 2000, у: <em>Ридер из политикологије религије</em>.',
-          'Jonathan Fox, „Do Democracies Have Separation of Religion and State", <em>Canadian Journal of Political Science</em>, Vol. 40, No. 1, 2007, у: <em>Ридер из политикологије религије</em>.',
-        ]
-      },
-      {
-        date: '29. мај',
-        topic: 'Шинтоизам & конфучијанизам',
-        lit: [
-          'Марко Вековић, <em>Религија за политикологе...</em> — поглавља „Шинтоизам" и „Конфучијанизам".',
-          'Daniel Philpott, „Explaining the Political Ambivalence of Religion", <em>American Political Science Review</em>, Vol. 101, No. 3, 2007, у: <em>Ридер из политикологије религије</em>.',
-        ]
-      },
-    ]
-  }
-};
+// Детаљи по предмету (отварају се кликом на картицу са класом has-detail)
+const DETAILS = {};
+
+function esc(s) {
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
 
 function openDrawer(key) {
   const data = DETAILS[key];
@@ -585,7 +529,17 @@ drawer.addEventListener('touchend', e => {
   if (e.changedTouches[0].clientY - startY > 60) closeDrawer();
 });
 
-const items = [];
+const STORAGE_KEY = 'kolokvijumi_zimski_2026_27';
+let items = [];
+try {
+  const saved = localStorage.getItem(STORAGE_KEY);
+  if (saved) items = JSON.parse(saved) || [];
+} catch (e) { items = []; }
+
+function save() {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(items)); } catch (e) {}
+}
+
 const MONTHS = ['јануара','фебруара','марта','априла','маја','јуна',
                 'јула','августа','септембра','октобра','новембра','децембра'];
 
@@ -607,12 +561,12 @@ function render() {
     card.innerHTML = `
       <div class="k-bar"></div>
       <div class="k-info">
-        <div class="k-subject">${item.subject}</div>
+        <div class="k-subject">${esc(item.subject)}</div>
         <div class="k-date">${formatDate(item.date)}</div>
       </div>
       <div class="k-right">
-        <span class="k-badge">${item.num} колоквијум</span>
-        <button class="btn-del" onclick="deleteItem('${item.id}')">✕</button>
+        <span class="k-badge">${esc(item.num)} колоквијум</span>
+        <button class="btn-del" onclick="deleteItem('${esc(item.id)}')">✕</button>
       </div>
     `;
     list.appendChild(card);
@@ -626,6 +580,7 @@ function addKolok() {
   if (!subject) { flash('inp-subject'); return; }
   if (!date)    { flash('inp-date');    return; }
   items.push({ id: Date.now().toString(), subject, date, num });
+  save();
   render();
   document.getElementById('inp-subject').value = '';
   document.getElementById('inp-date').value = '';
@@ -633,7 +588,7 @@ function addKolok() {
 
 function deleteItem(id) {
   const idx = items.findIndex(i => i.id === id);
-  if (idx !== -1) { items.splice(idx, 1); render(); }
+  if (idx !== -1) { items.splice(idx, 1); save(); render(); }
 }
 
 function flash(id) {
@@ -645,6 +600,8 @@ function flash(id) {
 document.getElementById('inp-subject').addEventListener('keydown', e => {
   if (e.key === 'Enter') addKolok();
 });
+
+render();
 </script>
 </body>
 </html>
