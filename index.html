@@ -365,6 +365,63 @@
       text-transform: uppercase;
       color: #2e3248;
     }
+
+    /* ПЛАН ПОЛАГАЊА */
+    .espb-sum { background:#1c1f2b; border-radius:14px; padding:1rem 1.1rem; margin-bottom:0.9rem; display:flex; align-items:baseline; justify-content:space-between; gap:0.6rem; }
+    .espb-sum .es-l { font-size:0.65rem; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; color:#5a6080; }
+    .espb-sum .es-v { font-size:1.35rem; font-weight:700; color:#3ecf8e; }
+    .espb-sum .es-v span { font-size:0.85rem; font-weight:600; color:#676e8a; }
+    .plan-switch {
+      background:#1c1f2b; border-radius:14px; padding:1rem 1.1rem; margin-bottom:1.6rem;
+    }
+    .plan-switch .ps-label { font-size:0.65rem; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; color:#5a6080; margin-bottom:0.55rem; }
+    .seg { display:flex; gap:0.4rem; flex-wrap:wrap; }
+    .seg button {
+      flex:1; min-width:90px; background:#13151e; border:1px solid #2e3248; color:#8890aa; border-radius:8px;
+      font-family:inherit; font-size:0.78rem; font-weight:600; padding:0.55rem 0.6rem; cursor:pointer; transition:all .15s;
+    }
+    .seg button.on { background:#1a2e52; border-color:#4a8ef5; color:#74aeff; }
+    .ps-note { font-size:0.7rem; color:#676e8a; margin-top:0.6rem; line-height:1.5; }
+
+    .plan-wrap { margin-bottom:2rem; }
+    .plan-head { display:flex; align-items:center; justify-content:space-between; gap:0.6rem; margin-bottom:0.8rem; }
+    .plan-title { font-size:1.02rem; font-weight:700; color:#fff; }
+    .plan-restore { background:none; border:1px solid #2e3248; color:#8890aa; border-radius:8px; font-family:inherit; font-size:0.7rem; padding:0.3rem 0.6rem; cursor:pointer; }
+    .plan-restore:hover { color:#e4e6f0; border-color:#4a8ef5; }
+    .hidden-note { background:#171a24; border-radius:12px; padding:0.9rem 1rem; font-size:0.78rem; color:#676e8a; display:flex; justify-content:space-between; align-items:center; gap:0.6rem; }
+
+    .rok { background:#1c1f2b; border-radius:12px; padding:0.8rem 0.9rem; margin-bottom:0.55rem; }
+    .rok.rez { background:#2a2c35; }
+    .rok-top { display:flex; align-items:center; justify-content:space-between; margin-bottom:0.45rem; gap:0.5rem; }
+    .rok-name { font-size:0.88rem; font-weight:700; color:#e8eaf4; }
+    .rok-tag { font-size:0.58rem; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; padding:0.2rem 0.5rem; border-radius:6px; background:#3d2a0a; color:#f5a623; white-space:nowrap; }
+    .rok-empty { font-size:0.74rem; color:#4a4f68; padding:0.2rem 0; }
+
+    .ex { border-top:1px solid #262a3c; padding:0.5rem 0; }
+    .ex:first-of-type { border-top:none; }
+    .ex-main { display:flex; align-items:center; gap:0.6rem; cursor:pointer; }
+    .ex.locked .ex-main { cursor:not-allowed; opacity:0.55; }
+    .ex-info { flex:1; min-width:0; }
+    .ex-name { font-size:0.88rem; font-weight:600; color:#e8eaf4; line-height:1.3; }
+    .ex-meta { font-size:0.68rem; color:#676e8a; margin-top:0.12rem; }
+    .ex-meta .mv { color:#f5a623; font-weight:600; }
+    .chip { font-size:0.6rem; font-weight:700; letter-spacing:0.06em; text-transform:uppercase; padding:0.22rem 0.5rem; border-radius:6px; white-space:nowrap; background:#22263a; color:#676e8a; }
+    .chip.pass { background:#0f3328; color:#3ecf8e; }
+    .chip.fail { background:#3a1717; color:#e05c5c; }
+    .chip.skip { background:#3d2a0a; color:#f5a623; }
+    .ex.pass .ex-name { color:#7fe3b4; }
+    .ex.pass .ex-name span.t { text-decoration:line-through; text-decoration-color:#3ecf8e66; }
+
+    .ex-panel { display:flex; gap:0.4rem; flex-wrap:wrap; align-items:center; margin-top:0.6rem; padding:0.6rem; background:#13151e; border-radius:10px; }
+    .ex-panel select { background:#1c1f2b; border:1px solid #2e3248; color:#e4e6f0; border-radius:7px; font-family:inherit; font-size:0.8rem; padding:0.4rem 0.4rem; }
+    .ex-panel button { border:none; border-radius:7px; font-family:inherit; font-size:0.74rem; font-weight:700; padding:0.48rem 0.7rem; cursor:pointer; }
+    .b-pass { background:#3ecf8e; color:#06241a; }
+    .b-fail { background:#e05c5c; color:#2a0a0a; }
+    .b-skip { background:#f5a623; color:#2d1d00; }
+    .b-undo { background:#2a2d3e; color:#a0a6c0; }
+
+    .rez-sel { width:100%; background:#13151e; border:1px solid #2e3248; color:#e4e6f0; border-radius:8px; font-family:inherit; font-size:0.82rem; padding:0.6rem 0.6rem; margin-top:0.1rem; }
+    .unplaced { background:#2b1a1a; border-radius:12px; padding:0.8rem 0.9rem; font-size:0.78rem; color:#e0a0a0; margin-bottom:0.55rem; }
   </style>
 </head>
 <body>
@@ -476,6 +533,25 @@
   <div class="kolok-list" id="kolok-list">
     <div class="empty-state" id="empty-msg">Нема уписаних колоквијума</div>
   </div>
+
+
+  <!-- ПЛАН ПОЛАГАЊА -->
+  <hr class="section-divider">
+  <h2>План полагања</h2>
+
+  <div class="espb-sum" id="espb-sum"></div>
+
+  <div class="plan-switch">
+    <div class="ps-label">Децембарски апсолвентски рок</div>
+    <div class="seg" id="dec-seg">
+      <button data-v="unknown">Још се не зна</button>
+      <button data-v="yes">Постоји (опција 2)</button>
+      <button data-v="no">Не постоји (опција 1)</button>
+    </div>
+    <div class="ps-note">Опција 2 се сама потврђује чим означиш излазак у децембру или мају. Непотврђена табела се само сакрије, увек је можеш вратити.</div>
+  </div>
+
+  <div id="plan-root"></div>
 
   <footer>Зимски семестар 2026/2027.</footer>
 </div>
@@ -598,6 +674,247 @@ document.getElementById('inp-subject').addEventListener('keydown', e => {
 });
 
 render();
+
+// ===================== ПЛАН ПОЛАГАЊА =====================
+const EX = {
+  SPI:{n:'Савремена политичка историја',e:6},
+  ESS:{n:'Економски систем Србије',e:6},
+  IBO:{n:'Историја балканских односа',e:4},
+  PSEU:{n:'Политички систем Европске уније',e:6},
+  SPT:{n:'Савремена политичка теорија',e:6},
+  ENG:{n:'Енглески језик 2',e:4},
+  PSSD:{n:'Политичка социологија савременог друштва',e:6},
+  TI:{n:'Теорија игара',e:6},
+  PKOM:{n:'Политичко комуницирање',e:6},
+  JU:{n:'Јавна управа',e:6},
+  LS:{n:'Локална самоуправа',e:6},
+  PK:{n:'Политичка култура и политички поредак',e:6},
+  PAR:{n:'Партије и партијски системи',e:6},
+  VZ:{n:'Верске заједнице у Србији',e:4},
+  IIS:{n:'Избори и изборни системи',e:6},
+  SPE:{n:'Социјална и политичка екологија',e:6},
+  PM:{n:'Политички маркетинг',e:6,doupis:true},
+  PU:{n:'Политичке установе и политички живот на Балкану',e:6,doupis:true}
+};
+const WINTER = ['PSSD','TI','PKOM','PK','PAR','IBO'];
+const SUMMER = ['JU','LS','VZ','IIS','SPE'];
+const NOVDEC = ['PSEU','ESS','SPT','SPI'];
+
+const ROK = {
+  nov:{n:'Новембар',ap:true,cap:2},
+  dec:{n:'Децембар',ap:true,cap:2},
+  jan:{n:'Јануар'},
+  feb:{n:'Фебруар'},
+  apr:{n:'Април',ap:true,cap:2},
+  maj:{n:'Мај',ap:true,cap:2},
+  jun:{n:'Јун'},
+  jul:{n:'Јул'},
+  avg:{n:'Август'},
+  sep:{n:'Септембар'},
+  sep2:{n:'Септембар 2',rez:true,cap:1,sub:'додатни, 1 испит'}
+};
+
+// може ли предмет у овај рок
+function okIn(id, rok) {
+  const x = EX[id];
+  if (rok === 'nov' || rok === 'dec') return NOVDEC.includes(id);
+  if (rok === 'apr' || rok === 'maj') return WINTER.includes(id);
+  if (rok === 'jan') return id !== 'ENG' && !SUMMER.includes(id) && !x.doupis;
+  if (rok === 'feb') return !SUMMER.includes(id) && !x.doupis;
+  return true; // јун–септембар
+}
+
+const PLANS = {
+  1: {
+    title: 'Опција 1',
+    sub: 'без децембарског и мајског апсолвентског рока',
+    roks: ['nov','jan','feb','apr','jun','jul','avg','sep','sep2'],
+    base: {
+      nov:['PSEU','ESS'], jan:['SPI','SPT'], feb:['IBO','PSSD','ENG'], apr:['PK','TI'],
+      jun:['PKOM','JU','VZ'], jul:['IIS','PAR'], avg:['PM','PU'], sep:['LS','SPE'], sep2:[]
+    }
+  },
+  2: {
+    title: 'Опција 2',
+    sub: 'са децембарским и мајским апсолвентским роком',
+    roks: ['nov','dec','jan','feb','apr','maj','jun','jul','avg','sep','sep2'],
+    base: {
+      nov:['PSEU','ESS'], dec:['SPT','SPI'], jan:['IBO','TI'], feb:['PSSD','ENG'], apr:['PK'], maj:['PKOM'],
+      jun:['JU','VZ'], jul:['PAR','IIS'], avg:['PM','PU'], sep:['LS','SPE'], sep2:[]
+    }
+  }
+};
+
+const PLAN_KEY = 'plan_polaganja_v1';
+let plan = { att:{}, dec:'unknown', rez:null };
+try {
+  const sv = localStorage.getItem(PLAN_KEY);
+  if (sv) { const p = JSON.parse(sv); if (p && p.att) plan = Object.assign(plan, p); }
+} catch (e) {}
+function savePlan() { try { localStorage.setItem(PLAN_KEY, JSON.stringify(plan)); } catch (e) {} }
+
+let openKey = null;
+
+function att(id, rok) { return (plan.att[id] || {})[rok] || null; }
+function passInfo(id) {
+  const a = plan.att[id] || {};
+  for (const r in a) if (a[r].o === 'pass') return { rok:r, g:a[r].g };
+  return null;
+}
+function passedAll(ids) { return ids.every(i => passInfo(i)); }
+function isLocked(id) { return !!EX[id].doupis && !passedAll(['PSEU','SPT']); }
+
+function baseOf(opt, rok) {
+  if (rok === 'sep2') return plan.rez ? [plan.rez] : [];
+  return PLANS[opt].base[rok];
+}
+
+// распоред једне опције: базни испити остају, пали/неизашли се додају у следећи слободан рок
+function compute(opt) {
+  const P = PLANS[opt], placed = {}, carry = {}, unplaced = [];
+  P.roks.forEach(r => { carry[r] = []; });
+  P.roks.forEach((rok, i) => {
+    const list = baseOf(opt, rok).map(id => ({ id, from:null })).concat(carry[rok]);
+    placed[rok] = list;
+    list.forEach(it => {
+      if (passInfo(it.id)) return;
+      const a = att(it.id, rok);
+      if (!a || (a.o !== 'fail' && a.o !== 'skip')) return;
+      let moved = false;
+      for (let j = i + 1; j < P.roks.length; j++) {
+        const r2 = P.roks[j], cap = ROK[r2].cap || Infinity;
+        if (!okIn(it.id, r2)) continue;
+        if (baseOf(opt, r2).length + carry[r2].length >= cap) continue;
+        carry[r2].push({ id: it.id, from: rok });
+        moved = true; break;
+      }
+      if (!moved && rok !== 'sep2') unplaced.push(it.id);
+    });
+  });
+  return { placed, unplaced };
+}
+
+function chipFor(id, rok) {
+  const p = passInfo(id);
+  if (p) return { c:'pass', t:'Положен · ' + p.g };
+  const a = att(id, rok);
+  if (a && a.o === 'fail') return { c:'fail', t:'Пао' };
+  if (a && a.o === 'skip') return { c:'skip', t:'Нисам изашла' };
+  return { c:'', t:'Предстоји' };
+}
+
+function exRow(opt, rok, it) {
+  const id = it.id, x = EX[id], ch = chipFor(id, rok), locked = isLocked(id);
+  const key = opt + '|' + rok + '|' + id;
+  const isOpen = openKey === key && !locked;
+  let meta = x.e + ' ЕСПБ';
+  if (x.doupis) meta += ' · доупис' + (locked ? ' · 🔒 потребни ПСЕУ и СПТ' : '');
+  if (it.from) meta += ' · <span class="mv">↪ пребачен из: ' + ROK[it.from].n + '</span>';
+  let panel = '';
+  if (isOpen) {
+    const cur = passInfo(id);
+    let opts = '';
+    for (let g = 6; g <= 10; g++) opts += '<option value="' + g + '"' + (cur && cur.g === g ? ' selected' : '') + '>' + g + '</option>';
+    panel = '<div class="ex-panel">' +
+      '<select id="gr-' + key + '">' + opts + '</select>' +
+      '<button class="b-pass" data-act="pass">Положила</button>' +
+      '<button class="b-fail" data-act="fail">Пала</button>' +
+      '<button class="b-skip" data-act="skip">Нисам изашла</button>' +
+      '<button class="b-undo" data-act="undo">Поништи</button>' +
+      (rok === 'sep2' && plan.rez === id ? '<button class="b-undo" data-act="rem">Уклони из резерве</button>' : '') + '</div>';
+  }
+  return '<div class="ex ' + (ch.c === 'pass' ? 'pass' : '') + (locked ? ' locked' : '') + '" data-opt="' + opt + '" data-rok="' + rok + '" data-id="' + id + '">' +
+    '<div class="ex-main" data-toggle="' + key + '"><div class="ex-info"><div class="ex-name"><span class="t">' + esc(x.n) + '</span></div>' +
+    '<div class="ex-meta">' + meta + '</div></div><span class="chip ' + ch.c + '">' + ch.t + '</span></div>' + panel + '</div>';
+}
+
+function renderOpt(opt) {
+  const P = PLANS[opt], { placed, unplaced } = compute(opt);
+  let h = '<div class="plan-wrap"><div class="plan-head"><div class="plan-title">' + P.title +
+    '<div style="font-size:0.68rem;font-weight:400;color:#676e8a;margin-top:0.15rem">' + P.sub + '</div></div></div>';
+  P.roks.forEach(rok => {
+    const R = ROK[rok];
+    const tag = R.ap ? 'апсолвентски, max ' + R.cap : (R.sub || '');
+    h += '<div class="rok' + (R.rez ? ' rez' : '') + '"><div class="rok-top"><div class="rok-name">' + R.n + '</div>' +
+      (tag ? '<span class="rok-tag">' + tag + '</span>' : '') + '</div>';
+    if (!placed[rok].length) {
+      if (R.rez) {
+        const cand = Object.keys(EX).filter(id => !passInfo(id) && !isLocked(id));
+        h += '<select class="rez-sel"><option value="">— изабери испит који пријављујеш —</option>' +
+          cand.map(id => '<option value="' + id + '">' + esc(EX[id].n) + ' (' + EX[id].e + ' ЕСПБ)</option>').join('') + '</select>' +
+          (cand.length ? '' : '<div class="rok-empty">сви испити су положени</div>');
+      } else h += '<div class="rok-empty">нема испита</div>';
+    }
+    placed[rok].forEach(it => { h += exRow(opt, rok, it); });
+    h += '</div>';
+  });
+  if (unplaced.length) {
+    h += '<div class="unplaced">Нема слободног рока за: ' + unplaced.map(i => esc(EX[i].n)).join(', ') + '</div>';
+  }
+  return h + '</div>';
+}
+
+function renderSum() {
+  let got = 0, all = 0;
+  Object.keys(EX).forEach(id => { all += EX[id].e; if (passInfo(id)) got += EX[id].e; });
+  document.getElementById('espb-sum').innerHTML =
+    '<div class="es-l">Положено ЕСПБ</div><div class="es-v">' + got + ' <span>/ ' + all + '</span></div>';
+}
+
+function renderPlan() {
+  renderSum();
+  document.querySelectorAll('#dec-seg button').forEach(b => b.classList.toggle('on', b.dataset.v === plan.dec));
+  let h = '';
+  if (plan.dec !== 'yes') h += renderOpt(1);
+  else h += '<div class="hidden-note"><span>Опција 1 је сакривена (децембарски рок постоји).</span></div>';
+  if (plan.dec !== 'no') h += renderOpt(2);
+  else h += '<div class="hidden-note"><span>Опција 2 је сакривена (децембарски рок не постоји).</span></div>';
+  document.getElementById('plan-root').innerHTML = h;
+}
+
+document.getElementById('dec-seg').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  plan.dec = b.dataset.v; savePlan(); renderPlan();
+});
+
+document.getElementById('plan-root').addEventListener('change', e => {
+  const sel = e.target.closest('select.rez-sel'); if (!sel) return;
+  plan.rez = sel.value || null; savePlan(); renderPlan();
+});
+
+document.getElementById('plan-root').addEventListener('click', e => {
+  const btn = e.target.closest('button[data-act]');
+  if (btn) {
+    const ex = btn.closest('.ex'), id = ex.dataset.id, rok = ex.dataset.rok, key = ex.dataset.opt + '|' + rok + '|' + id;
+    const act = btn.dataset.act;
+    if (!plan.att[id]) plan.att[id] = {};
+    if (act === 'rem') {
+      delete plan.att[id][rok]; plan.rez = null;
+    } else if (act === 'undo') {
+      delete plan.att[id][rok];
+      for (const r in plan.att[id]) if (plan.att[id][r].o === 'pass') delete plan.att[id][r];
+    } else {
+      const o = { o: act };
+      if (act === 'pass') o.g = parseInt(document.getElementById('gr-' + key).value, 10);
+      // један испит може имати само један положен покушај
+      if (act === 'pass') for (const r in plan.att[id]) if (plan.att[id][r].o === 'pass') delete plan.att[id][r];
+      plan.att[id][rok] = o;
+      if ((rok === 'dec' || rok === 'maj') && plan.dec !== 'yes') plan.dec = 'yes';
+    }
+    if (!Object.keys(plan.att[id]).length) delete plan.att[id];
+    openKey = null; savePlan(); renderPlan();
+    return;
+  }
+  const t = e.target.closest('[data-toggle]');
+  if (t) {
+    const id = t.closest('.ex').dataset.id;
+    if (isLocked(id)) return;
+    openKey = (openKey === t.dataset.toggle) ? null : t.dataset.toggle;
+    renderPlan();
+  }
+});
+
+renderPlan();
 </script>
 </body>
 </html>
