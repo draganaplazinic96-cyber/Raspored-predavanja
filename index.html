@@ -93,6 +93,7 @@
     .c-bar { width:4px; height:36px; border-radius:4px; flex-shrink:0; }
     .bar-p { background: #4a8ef5; }
     .bar-v { background: #3ecf8e; }
+    .bar-pv { background: linear-gradient(to bottom, #4a8ef5 50%, #3ecf8e 50%); }
 
     .c-info { min-width:0; }
     .c-subject {
@@ -119,6 +120,7 @@
     }
     .type-p { background:#1a2e52; color:#74aeff; }
     .type-v { background:#0f3328; color:#3ecf8e; }
+    .type-pv { background:#133245; color:#6fd3c4; }
 
     .detail-arrow {
       font-size: 0.75rem;
@@ -442,6 +444,7 @@
   <div class="legend">
     <div class="legend-item"><div class="legend-dot" style="background:#4a8ef5"></div> Предавање</div>
     <div class="legend-item"><div class="legend-dot" style="background:#3ecf8e"></div> Вежбе</div>
+    <div class="legend-item"><div class="legend-dot" style="background:linear-gradient(135deg,#4a8ef5 50%,#3ecf8e 50%)"></div> Предавање + вежбе</div>
   </div>
 
   <!-- ПОНЕДЕЉАК -->
@@ -469,14 +472,14 @@
     <div class="day-title">Среда</div>
     <div class="entries">
       <div class="card">
-        <div class="c-time">09:30</div><div class="c-bar bar-p"></div>
+        <div class="c-time">09:30</div><div class="c-bar bar-pv"></div>
         <div class="c-info"><div class="c-subject">Политичка култура и политички поредак</div><div class="c-loc">09:30–12:30 · Слушаоница 1</div></div>
-        <div class="c-right"><div class="c-type type-p">Предавање</div></div>
+        <div class="c-right"><div class="c-type type-pv">Предавање + вежбе</div></div>
       </div>
       <div class="card">
-        <div class="c-time">14:00</div><div class="c-bar bar-p"></div>
+        <div class="c-time">14:00</div><div class="c-bar bar-pv"></div>
         <div class="c-info"><div class="c-subject">Политичко комуницирање</div><div class="c-loc">14:00–16:30 · Слушаоница 5</div></div>
-        <div class="c-right"><div class="c-type type-p">Предавање</div></div>
+        <div class="c-right"><div class="c-type type-pv">Предавање + вежбе</div></div>
       </div>
     </div>
   </div>
