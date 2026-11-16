@@ -285,7 +285,8 @@
     .field input:focus, .field select:focus { border-color: #4a8ef5; }
     .field input::placeholder { color: #3a3f58; }
 
-    input[type="date"]::-webkit-calendar-picker-indicator {
+    input[type="date"]::-webkit-calendar-picker-indicator,
+    input[type="time"]::-webkit-calendar-picker-indicator {
       filter: invert(0.5);
       cursor: pointer;
     }
@@ -535,6 +536,12 @@
         <input type="date" id="inp-date">
       </div>
       <div class="field">
+        <label>Време</label>
+        <input type="time" id="inp-time">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="field" style="grid-column: 1 / -1;">
         <label>Колоквијум</label>
         <select id="inp-num">
           <option value="I">I колоквијум</option>
@@ -632,7 +639,7 @@ function render() {
   list.querySelectorAll('.kolok-card').forEach(c => c.remove());
   if (items.length === 0) { empty.style.display = 'block'; return; }
   empty.style.display = 'none';
-  const sorted = [...items].sort((a,b) => a.date.localeCompare(b.date));
+  const sorted = [...items].sort((a,b) => (a.date + ' ' + (a.time || '')).localeCompare(b.date + ' ' + (b.time || '')));
   sorted.forEach(item => {
     const card = document.createElement('div');
     card.className = 'kolok-card';
@@ -640,7 +647,7 @@ function render() {
       <div class="k-bar"></div>
       <div class="k-info">
         <div class="k-subject">${esc(item.subject)}</div>
-        <div class="k-date">${formatDate(item.date)}</div>
+        <div class="k-date">${formatDate(item.date)}${item.time ? ' · ' + esc(item.time) : ''}</div>
       </div>
       <div class="k-right">
         <span class="k-badge">${esc(item.num)} колоквијум</span>
@@ -654,14 +661,16 @@ function render() {
 function addKolok() {
   const subject = document.getElementById('inp-subject').value.trim();
   const date    = document.getElementById('inp-date').value;
+  const time    = document.getElementById('inp-time').value;
   const num     = document.getElementById('inp-num').value;
   if (!subject) { flash('inp-subject'); return; }
   if (!date)    { flash('inp-date');    return; }
-  items.push({ id: Date.now().toString(), subject, date, num });
+  items.push({ id: Date.now().toString(), subject, date, time, num });
   save();
   render();
   document.getElementById('inp-subject').value = '';
   document.getElementById('inp-date').value = '';
+  document.getElementById('inp-time').value = '';
 }
 
 function deleteItem(id) {
