@@ -430,6 +430,14 @@
 
     .rez-sel { width:100%; background:#13151e; border:1px solid #2e3248; color:#e4e6f0; border-radius:8px; font-family:inherit; font-size:0.82rem; padding:0.6rem 0.6rem; margin-top:0.1rem; }
     .unplaced { background:#2b1a1a; border-radius:12px; padding:0.8rem 0.9rem; font-size:0.78rem; color:#e0a0a0; margin-bottom:0.55rem; }
+
+    .rok-right { display:flex; align-items:center; gap:0.4rem; }
+    .btn-close { background:none; border:1px solid #2e3248; color:#8890aa; border-radius:6px; font-family:inherit; font-size:0.62rem; font-weight:700; padding:0.25rem 0.5rem; cursor:pointer; white-space:nowrap; }
+    .btn-close:hover { color:#3ecf8e; border-color:#3ecf8e; }
+    .add-sel { width:100%; background:#13151e; border:1px dashed #2e3248; color:#8890aa; border-radius:8px; font-family:inherit; font-size:0.78rem; padding:0.5rem; margin-top:0.45rem; }
+    .chip.out { background:#133245; color:#6fd3c4; }
+    .b-out { background:#6fd3c4; color:#06241a; }
+    .restore-row { text-align:center; margin-top:0.4rem; }
   </style>
 </head>
 <body>
@@ -711,10 +719,12 @@ const EX = {
   PM:{n:'Политички маркетинг',e:6,doupis:true},
   PU:{n:'Политичке установе и политички живот на Балкану',e:6,doupis:true}
 };
+const IDS = Object.keys(EX);
 const WINTER = ['PSSD','TI','PKOM','PK','PAR','IBO'];
 const SUMMER = ['JU','LS','VZ','IIS','SPE'];
 const NOVDEC = ['PSEU','ESS','SPT','SPI'];
 
+// cap постоји САМО у апсолвентским роковима (нов, дец, апр, мај) и у резервном септембру
 const ROK = {
   nov:{n:'Новембар',ap:true,cap:2},
   dec:{n:'Децембар',ap:true,cap:2},
@@ -728,6 +738,17 @@ const ROK = {
   sep:{n:'Септембар'},
   sep2:{n:'Септембар 2',rez:true,cap:1,sub:'додатни, 1 испит'}
 };
+const SEQ = ['nov','dec','jan','feb','apr','maj','jun','jul','avg','sep','sep2'];
+const AUTO = SEQ.slice(0, -1); // у резервни рок се иде само ручно
+
+// почетни распоред (важи док ништа не промениш / не завршиш рок / не паднеш)
+const BASE = {
+  nov:['PSEU','SPT'], dec:['ESS','SPI'], jan:['IBO','TI'], feb:['PSSD','ENG'], apr:['PK'], maj:['PKOM'],
+  jun:['JU','VZ'], jul:['PAR','IIS'], avg:['PM','PU'], sep:['LS','SPE']
+};
+function baseRok(id) { for (const r in BASE) if (BASE[r].includes(id)) return r; return null; }
+function capOf(r) { return ROK[r].cap || Infinity; }
+function ix(r) { return SEQ.indexOf(r); }
 
 // може ли предмет у овај рок
 function okIn(id, rok) {
@@ -739,25 +760,24 @@ function okIn(id, rok) {
   return true; // јун–септембар
 }
 
-const PLANS = {
-  2: {
-    title: 'План по роковима',
-    sub: 'са децембарским и мајским апсолвентским роком',
-    roks: ['nov','dec','jan','feb','apr','maj','jun','jul','avg','sep','sep2'],
-    base: {
-      nov:['PSEU','SPT'], dec:['ESS','SPI'], jan:['IBO','TI'], feb:['PSSD','ENG'], apr:['PK'], maj:['PKOM'],
-      jun:['JU','VZ'], jul:['PAR','IIS'], avg:['PM','PU'], sep:['LS','SPE'], sep2:[]
-    }
-  }
-};
-
-const PLAN_KEY = 'plan_polaganja_v1';
-let plan = { att:{}, move:{}, rez:null };
+// plan.att[id][rok] = {o:'reg'|'out'|'pass'|'fail'|'skip', g}
+// plan.pin[id] = рок који си ти ручно изабрала
+// plan.closed[rok] = true  → рок је завршен и више се не приказује
+// plan.auto = true  → остатак се равномерно прерасподељује
+const PLAN_KEY = 'plan_polaganja_v2';
+let plan = { att:{}, pin:{}, closed:{}, rez:null, auto:false };
 try {
   const sv = localStorage.getItem(PLAN_KEY);
-  if (sv) { const p = JSON.parse(sv); if (p && p.att) plan = Object.assign(plan, p); }
+  if (sv) {
+    const p = JSON.parse(sv);
+    if (p && p.att) plan = Object.assign(plan, p);
+  } else {
+    const old = localStorage.getItem('plan_polaganja_v1');
+    if (old) { const p = JSON.parse(old); if (p && p.att) { plan.att = p.att; plan.rez = p.rez || null; } }
+  }
 } catch (e) {}
-if (!plan.move) plan.move = {};
+if (!plan.pin) plan.pin = {};
+if (!plan.closed) plan.closed = {};
 function savePlan() { try { localStorage.setItem(PLAN_KEY, JSON.stringify(plan)); } catch (e) {} }
 
 let openKey = null;
@@ -770,166 +790,213 @@ function passInfo(id) {
 }
 function passedAll(ids) { return ids.every(i => passInfo(i)); }
 function isLocked(id) { return !!EX[id].doupis && !passedAll(['PSEU','SPT']); }
-
-function rokOf(opt, id) {
-  const m = plan.move[id];
-  if (m && m !== 'sep2' && PLANS[opt].roks.includes(m) && okIn(id, m)) return m;
-  const b = PLANS[opt].base;
-  for (const r in b) if (b[r].includes(id)) return r;
-  return null;
+function lastFail(id) {
+  let m = -1; const a = plan.att[id] || {};
+  for (const r in a) if (a[r].o === 'fail' || a[r].o === 'skip') m = Math.max(m, ix(r));
+  return m;
 }
-function baseOf(opt, rok) {
-  if (rok === 'sep2') return plan.rez ? [plan.rez] : [];
-  const order = [].concat(...Object.values(PLANS[opt].base));
-  return order.filter(id => rokOf(opt, id) === rok);
+function lastClosed() {
+  let m = -1;
+  for (const r in plan.closed) if (plan.closed[r]) m = Math.max(m, ix(r));
+  return m;
 }
 
-// распоред једне опције: базни испити остају, пали/неизашли се додају у следећи слободан рок
-function compute(opt) {
-  const P = PLANS[opt], placed = {}, carry = {}, unplaced = [];
-  P.roks.forEach(r => { carry[r] = []; });
-  P.roks.forEach((rok, i) => {
-    const list = baseOf(opt, rok).map(id => ({ id, from:null })).concat(carry[rok]);
-    placed[rok] = list;
-    list.forEach(it => {
-      if (passInfo(it.id)) return;
-      const a = att(it.id, rok);
-      if (!a || (a.o !== 'fail' && a.o !== 'skip')) return;
-      let moved = false;
-      for (let j = i + 1; j < P.roks.length; j++) {
-        const r2 = P.roks[j], cap = ROK[r2].cap || Infinity;
-        if (!okIn(it.id, r2)) continue;
-        if (baseOf(opt, r2).length + carry[r2].length >= cap) continue;
-        carry[r2].push({ id: it.id, from: rok });
-        moved = true; break;
-      }
-      if (!moved && rok !== 'sep2') unplaced.push(it.id);
-    });
+// Распоред: фиксирани (положени, ручно изабрани, пријављени) остају где јесу,
+// остатак се равномерно распоређује по отвореним роковима (limit само у апсолвентским).
+function compute() {
+  const lc = lastClosed(), place = {}, load = {}, rest = [];
+  SEQ.forEach(r => { load[r] = 0; });
+  IDS.forEach(id => { for (const r in (plan.att[id] || {})) load[r]++; });
+  const auto = plan.auto || lc >= 0 || IDS.some(id => lastFail(id) >= 0);
+  const valid = (id, r) => r && !plan.closed[r] && ix(r) > lc && ix(r) > lastFail(id) && okIn(id, r);
+
+  IDS.forEach(id => {
+    if (passInfo(id)) return;
+    let r = null;
+    if (plan.rez === id && lastFail(id) < ix('sep2') && !plan.closed.sep2) r = 'sep2';
+    else if (valid(id, plan.pin[id])) r = plan.pin[id];
+    else {
+      const a = plan.att[id] || {};
+      for (const k in a) if ((a[k].o === 'reg' || a[k].o === 'out') && valid(id, k)) r = k;
+    }
+    if (!r && !auto && valid(id, baseRok(id))) r = baseRok(id);
+    if (r) { place[id] = r; if (!att(id, r)) load[r]++; } else rest.push(id);
   });
-  return { placed, unplaced };
+
+  const cands = id => AUTO.filter(r => valid(id, r) && load[r] < capOf(r) && !att(id, r));
+  rest.sort((a, b) => cands(a).length - cands(b).length); // најстрожије ограничени прво
+  const unplaced = [];
+  rest.forEach(id => {
+    const c = cands(id), b = baseRok(id);
+    if (!c.length) { unplaced.push(id); return; }
+    c.sort((x, y) => load[x] - load[y] || ((x === b ? 0 : 1) - (y === b ? 0 : 1)) || ix(x) - ix(y));
+    place[id] = c[0]; load[c[0]]++;
+  });
+  return { place, unplaced, load };
 }
 
 function chipFor(id, rok) {
-  const p = passInfo(id);
-  if (p) return { c:'pass', t:'Положен · ' + p.g };
   const a = att(id, rok);
-  if (a && a.o === 'fail') return { c:'fail', t:'Пао' };
-  if (a && a.o === 'skip') return { c:'skip', t:'Нисам изашла' };
-  if (a && a.o === 'reg') return { c:'reg', t:'Пријавила' };
-  return { c:'', t:'Предстоји' };
+  if (!a) return { c:'', t:'Предстоји' };
+  if (a.o === 'pass') return { c:'pass', t:'Положен · ' + a.g };
+  if (a.o === 'fail') return { c:'fail', t:'Пао' };
+  if (a.o === 'skip') return { c:'skip', t:'Нисам изашла' };
+  if (a.o === 'out')  return { c:'out',  t:'Изашла' };
+  return { c:'reg', t:'Пријавила' };
 }
 
-function exRow(opt, rok, it) {
+function exRow(rok, it, ctx) {
   const id = it.id, x = EX[id], ch = chipFor(id, rok), locked = isLocked(id);
-  const key = opt + '|' + rok + '|' + id;
-  const isOpen = openKey === key;
+  const key = rok + '|' + id, isOpen = openKey === key;
+  const placedHere = ctx.place[id] === rok;
+  const pinned = placedHere && plan.pin[id] === rok;
   let meta = x.e + ' ЕСПБ';
   if (x.doupis) meta += ' · доупис' + (locked ? ' · 🔒 потребни ПСЕУ и СПТ' : '');
   if (it.from) meta += ' · <span class="mv">↪ пребачен из: ' + ROK[it.from].n + '</span>';
+  if (pinned) meta += ' · <span class="mv">📌 ручно</span>';
   let panel = '';
   if (isOpen) {
-    const cur = passInfo(id);
+    const cur = att(id, rok), curG = cur && cur.o === 'pass' ? cur.g : null;
     let opts = '';
-    for (let g = 6; g <= 10; g++) opts += '<option value="' + g + '"' + (cur && cur.g === g ? ' selected' : '') + '>' + g + '</option>';
-    let sw = '';
-    if (!it.from && rok !== 'sep2') {
-      sw = '<div class="ex-swap"><span>Замени предметом</span><select class="sw-sel" data-id="' + id + '"><option value="">— изабери предмет —</option>' +
-        Object.keys(EX).filter(o => o !== id && rokOf(opt, o) && rokOf(opt, o) !== rok).map(o => {
-          const r2 = rokOf(opt, o), okk = okIn(id, r2) && okIn(o, rok);
-          return '<option value="' + o + '"' + (okk ? '' : ' disabled') + '>' + esc(EX[o].n) + ' — ' + ROK[r2].n + '</option>';
+    for (let g = 6; g <= 10; g++) opts += '<option value="' + g + '"' + (curG === g ? ' selected' : '') + '>' + g + '</option>';
+    let mv = '';
+    if (placedHere && !passInfo(id) && rok !== 'sep2') {
+      const lc = lastClosed(), lf = lastFail(id);
+      const list = AUTO.filter(r2 => r2 !== rok && !plan.closed[r2] && ix(r2) > lc && ix(r2) > lf && okIn(id, r2));
+      mv = '<div class="ex-swap"><span>Премести у рок</span><select class="mv-sel" data-id="' + id + '"><option value="">— изабери рок —</option>' +
+        list.map(r2 => {
+          const full = ctx.load[r2] >= capOf(r2);
+          return '<option value="' + r2 + '"' + (full ? ' disabled' : '') + '>' + ROK[r2].n + (full ? ' (пун)' : '') + '</option>';
         }).join('') + '</select></div>';
     }
     panel = '<div class="ex-panel">' +
       (locked ? '' :
         '<button class="b-reg" data-act="reg">Пријавила</button>' +
+        '<button class="b-out" data-act="out">Изашла</button>' +
         '<select id="gr-' + key + '">' + opts + '</select>' +
         '<button class="b-pass" data-act="pass">Положила</button>' +
         '<button class="b-fail" data-act="fail">Пала</button>' +
         '<button class="b-skip" data-act="skip">Нисам изашла</button>' +
         '<button class="b-undo" data-act="undo">Поништи</button>') +
       (rok === 'sep2' && plan.rez === id ? '<button class="b-undo" data-act="rem">Уклони из резерве</button>' : '') +
-      sw + '</div>';
+      (pinned ? '<button class="b-undo" data-act="unpin">Врати на аутоматски</button>' : '') +
+      mv + '</div>';
   }
-  return '<div class="ex ' + (ch.c === 'pass' ? 'pass' : '') + (locked ? ' locked' : '') + '" data-opt="' + opt + '" data-rok="' + rok + '" data-id="' + id + '">' +
+  return '<div class="ex ' + (ch.c === 'pass' ? 'pass' : '') + (locked ? ' locked' : '') + '" data-rok="' + rok + '" data-id="' + id + '">' +
     '<div class="ex-main" data-toggle="' + key + '"><div class="ex-info"><div class="ex-name"><span class="t">' + esc(x.n) + '</span></div>' +
     '<div class="ex-meta">' + meta + '</div></div><span class="chip ' + ch.c + '">' + ch.t + '</span></div>' + panel + '</div>';
 }
 
-function renderOpt(opt) {
-  const P = PLANS[opt], { placed, unplaced } = compute(opt);
-  let h = '<div class="plan-wrap"><div class="plan-head"><div class="plan-title">' + P.title +
-    '<div style="font-size:0.68rem;font-weight:400;color:#676e8a;margin-top:0.15rem">' + P.sub + '</div></div></div>';
-  P.roks.forEach(rok => {
-    const R = ROK[rok];
-    const tag = R.ap ? 'апсолвентски, max ' + R.cap : (R.sub || '');
-    h += '<div class="rok' + (R.rez ? ' rez' : '') + '"><div class="rok-top"><div class="rok-name">' + R.n + '</div>' +
-      (tag ? '<span class="rok-tag">' + tag + '</span>' : '') + '</div>';
-    if (!placed[rok].length) {
-      if (R.rez) {
-        const cand = Object.keys(EX).filter(id => !passInfo(id) && !isLocked(id));
-        h += '<select class="rez-sel"><option value="">— изабери испит који пријављујеш —</option>' +
-          cand.map(id => '<option value="' + id + '">' + esc(EX[id].n) + ' (' + EX[id].e + ' ЕСПБ)</option>').join('') + '</select>' +
-          (cand.length ? '' : '<div class="rok-empty">сви испити су положени</div>');
-      } else h += '<div class="rok-empty">нема испита</div>';
-    }
-    placed[rok].forEach(it => { h += exRow(opt, rok, it); });
-    h += '</div>';
-  });
-  if (unplaced.length) {
-    h += '<div class="unplaced">Нема слободног рока за: ' + unplaced.map(i => esc(EX[i].n)).join(', ') + '</div>';
-  }
-  return h + '</div>';
-}
-
 function renderSum() {
   let got = 0, all = 0;
-  Object.keys(EX).forEach(id => { all += EX[id].e; if (passInfo(id)) got += EX[id].e; });
+  IDS.forEach(id => { all += EX[id].e; if (passInfo(id)) got += EX[id].e; });
   document.getElementById('espb-sum').innerHTML =
     '<div class="es-l">Положено ЕСПБ</div><div class="es-v">' + got + ' <span>/ ' + all + '</span></div>';
 }
 
 function renderPlan() {
   renderSum();
-  document.getElementById('plan-root').innerHTML = renderOpt(2);
+  const ctx = compute();
+  let h = '<div class="plan-wrap"><div class="plan-head"><div class="plan-title">План по роковима' +
+    '<div style="font-size:0.68rem;font-weight:400;color:#676e8a;margin-top:0.15rem">остатак се равномерно распоређује по преосталим роковима</div></div></div>';
+
+  SEQ.forEach(rok => {
+    if (plan.closed[rok]) return;
+    const R = ROK[rok];
+    const entries = IDS.filter(id => ctx.place[id] === rok || att(id, rok)).map(id => {
+      let from = null;
+      if (ctx.place[id] === rok) {
+        const lf = lastFail(id);
+        if (lf >= 0 && !plan.closed[SEQ[lf]]) from = SEQ[lf];
+      }
+      return { id, from };
+    });
+    const tag = R.ap ? 'апсолвентски, max ' + R.cap : (R.sub || '');
+    h += '<div class="rok' + (R.rez ? ' rez' : '') + '"><div class="rok-top"><div class="rok-name">' + R.n + '</div>' +
+      '<div class="rok-right">' + (tag ? '<span class="rok-tag">' + tag + '</span>' : '') +
+      '<button class="btn-close" data-act="close" data-rok="' + rok + '">Завршен рок</button></div></div>';
+
+    if (!entries.length) {
+      if (R.rez) {
+        const cand = IDS.filter(id => !passInfo(id) && !isLocked(id));
+        h += '<select class="rez-sel"><option value="">— изабери испит који пријављујеш —</option>' +
+          cand.map(id => '<option value="' + id + '">' + esc(EX[id].n) + ' (' + EX[id].e + ' ЕСПБ)</option>').join('') + '</select>' +
+          (cand.length ? '' : '<div class="rok-empty">сви испити су положени</div>');
+      } else h += '<div class="rok-empty">нема испита</div>';
+    }
+    entries.forEach(it => { h += exRow(rok, it, ctx); });
+
+    // додавање испита у овај рок
+    if (!R.rez && ctx.load[rok] < capOf(rok)) {
+      const lc = lastClosed();
+      const cand = IDS.filter(id => !passInfo(id) && !isLocked(id) && ctx.place[id] !== rok && !att(id, rok) &&
+        ix(rok) > lc && ix(rok) > lastFail(id) && okIn(id, rok));
+      if (cand.length) {
+        h += '<select class="add-sel" data-rok="' + rok + '"><option value="">+ додај испит у овај рок</option>' +
+          cand.map(id => '<option value="' + id + '">' + esc(EX[id].n) + ' — сад: ' + (ctx.place[id] ? ROK[ctx.place[id]].n : 'без рока') + '</option>').join('') + '</select>';
+      }
+    }
+    h += '</div>';
+  });
+
+  if (ctx.unplaced.length) {
+    h += '<div class="unplaced">Нема слободног рока за: ' + ctx.unplaced.map(i => esc(EX[i].n)).join(', ') + '</div>';
+  }
+  if (lastClosed() >= 0) {
+    h += '<div class="restore-row"><button class="plan-restore" data-act="restore">↺ Врати последњи завршени рок</button></div>';
+  }
+  document.getElementById('plan-root').innerHTML = h + '</div>';
+}
+
+function pinTo(id, rok) {
+  plan.pin[id] = rok; plan.auto = true;
+  if (plan.rez === id) plan.rez = null;
 }
 
 document.getElementById('plan-root').addEventListener('change', e => {
-  const sw = e.target.closest('select.sw-sel');
-  if (sw) {
-    if (!sw.value) return;
-    const a = sw.dataset.id, b = sw.value, ra = rokOf(2, a), rb = rokOf(2, b);
-    plan.move[a] = rb; plan.move[b] = ra;
-    openKey = null; savePlan(); renderPlan(); return;
-  }
-  const sel = e.target.closest('select.rez-sel'); if (!sel) return;
-  plan.rez = sel.value || null; savePlan(); renderPlan();
+  const t = e.target;
+  if (!t.value) return;
+  if (t.classList.contains('mv-sel')) pinTo(t.dataset.id, t.value);
+  else if (t.classList.contains('add-sel')) pinTo(t.value, t.dataset.rok);
+  else if (t.classList.contains('rez-sel')) { plan.rez = t.value; delete plan.pin[t.value]; plan.auto = true; }
+  else return;
+  openKey = null; savePlan(); renderPlan();
 });
 
 document.getElementById('plan-root').addEventListener('click', e => {
   const btn = e.target.closest('button[data-act]');
   if (btn) {
-    const ex = btn.closest('.ex'), id = ex.dataset.id, rok = ex.dataset.rok, key = ex.dataset.opt + '|' + rok + '|' + id;
     const act = btn.dataset.act;
-    if (!plan.att[id]) plan.att[id] = {};
-    if (act === 'rem') {
-      delete plan.att[id][rok]; plan.rez = null;
-    } else if (act === 'undo') {
-      delete plan.att[id][rok];
-      for (const r in plan.att[id]) if (plan.att[id][r].o === 'pass') delete plan.att[id][r];
+    if (act === 'close') {
+      const r = btn.dataset.rok;
+      plan.closed[r] = true; plan.auto = true;
+      for (const id in plan.pin) if (ix(plan.pin[id]) <= ix(r)) delete plan.pin[id];
+    } else if (act === 'restore') {
+      const lc = lastClosed();
+      if (lc >= 0) delete plan.closed[SEQ[lc]];
     } else {
-      const o = { o: act };
-      if (act === 'pass') o.g = parseInt(document.getElementById('gr-' + key).value, 10);
-      // један испит може имати само један положен покушај
-      if (act === 'pass') for (const r in plan.att[id]) if (plan.att[id][r].o === 'pass') delete plan.att[id][r];
-      plan.att[id][rok] = o;
+      const ex = btn.closest('.ex'), id = ex.dataset.id, rok = ex.dataset.rok, key = rok + '|' + id;
+      if (act === 'unpin') delete plan.pin[id];
+      else if (act === 'rem') { plan.rez = null; if (plan.att[id]) delete plan.att[id][rok]; }
+      else if (act === 'undo') { if (plan.att[id]) delete plan.att[id][rok]; }
+      else {
+        if (!plan.att[id]) plan.att[id] = {};
+        const o = { o: act };
+        if (act === 'pass') {
+          o.g = parseInt(document.getElementById('gr-' + key).value, 10);
+          for (const r in plan.att[id]) if (plan.att[id][r].o === 'pass') delete plan.att[id][r];
+          delete plan.pin[id];
+        }
+        if (act === 'fail' || act === 'skip') delete plan.pin[id];
+        plan.att[id][rok] = o;
+      }
+      if (plan.att[id] && !Object.keys(plan.att[id]).length) delete plan.att[id];
     }
-    if (!Object.keys(plan.att[id]).length) delete plan.att[id];
     openKey = null; savePlan(); renderPlan();
     return;
   }
   const t = e.target.closest('[data-toggle]');
   if (t) {
-    const id = t.closest('.ex').dataset.id;
     openKey = (openKey === t.dataset.toggle) ? null : t.dataset.toggle;
     renderPlan();
   }
